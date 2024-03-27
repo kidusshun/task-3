@@ -1,4 +1,5 @@
 import os
+from datetime import UTC, datetime
 from typing import Annotated
 from uuid import UUID, uuid4
 
@@ -8,9 +9,9 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from sqlalchemy.orm import Session
 
-from authentication.auth import get_current_active_user
+from src.authentication.auth import get_current_active_user
 from config import ACCESS_TOKEN_EXPIRE_MINUTES, ALGORITHM, SECRET_KEY
-from models import Blog, BlogRatings, User, get_db
+from model.models import Blog, BlogRatings, User, get_db
 
 from .schemas import CreateBlogRating, TokenData
 
@@ -41,8 +42,8 @@ async def rate_blog(
             blogID=createRating.blogID,
             userID=user.id,
             rating=createRating.rating,
-            createdAt=createRating.createdAt,
-            updatedAt=createRating.updatedAt,
+            createdAt=datetime.now(UTC),
+            updatedAt=datetime.now(UTC),
         )
         db.add(new_blog_rating)
         db.commit()
@@ -50,7 +51,7 @@ async def rate_blog(
         return new_blog_rating.__dict__
     else:
         blog_rating.rating = createRating.rating
-        blog_rating.updatedAt = createRating.updatedAt
+        blog_rating.updatedAt = datetime.now(UTC)
         db.commit()
         db.refresh(blog_rating)
         return blog_rating.__dict__

@@ -3,9 +3,9 @@ from sqlalchemy.orm import relationship, selectinload
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from config import SQLALCHEMY_DATABASE_URL
 
 
-SQLALCHEMY_DATABASE_URL = "postgresql://postgres:123@localhost:5432/blog"
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
@@ -160,6 +160,7 @@ class Follows(Base):
 
 
 def create_db():
+    # Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
 
 

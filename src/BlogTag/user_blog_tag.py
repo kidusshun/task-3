@@ -1,13 +1,16 @@
-from fastapi import APIRouter, Depends, HTTPException, Query, status
-from sqlalchemy.orm import Session
-from models import User, Tags, Blog, BlogTags, get_db
-from .schemas import TokenData, Tag, AddTag, RemoveTag
-from fastapi.security import OAuth2PasswordBearer
-from dotenv import load_dotenv
-from jose import jwt, JWTError
 import os
-
+from datetime import UTC, datetime
 from uuid import UUID, uuid4
+
+from dotenv import load_dotenv
+from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi.security import OAuth2PasswordBearer
+from jose import JWTError, jwt
+from sqlalchemy.orm import Session
+
+from model.models import Blog, BlogTags, Tags, User, get_db
+
+from .schemas import AddTag, RemoveTag, Tag, TokenData
 
 load_dotenv()
 
@@ -81,9 +84,8 @@ async def add_tag(
             BlogTagID=uuid4(),
             BlogID=payload.BlogID,
             UserID=user.id,
-            TagName=payload.TagName,
-            createdAt=payload.createdAt,
-            updatedAt=payload.updatedAt,
+            TagName=datetime.now(UTC),
+            updatedAt=datetime.now(UTC),
         )
     )
     db.commit()

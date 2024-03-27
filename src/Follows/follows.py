@@ -1,11 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
-from models import User, Comments, Blog, Follows, get_db
+from model.models import User, Comments, Blog, Follows, get_db
 from .schemas import TokenData, FollowUser, UnFollowUser
 from fastapi.security import OAuth2PasswordBearer
 from dotenv import load_dotenv
 from jose import jwt, JWTError
 import os
+from datetime import datetime, UTC
 
 from uuid import UUID, uuid4
 
@@ -73,8 +74,8 @@ async def follow(
         FollowID=uuid4(),
         FollowerID=user.id,
         FollowedID=payload.FollowedID,
-        CreatedAt=payload.CreatedAt,
-        UpdatedAt=payload.UpdatedAt,
+        CreatedAt=datetime.now(UTC),
+        UpdatedAt=datetime.now(UTC),
     )
     print(db_follow)
     db.add(db_follow)

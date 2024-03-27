@@ -1,5 +1,5 @@
 import os
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Annotated
 from uuid import UUID, uuid4
 
@@ -10,7 +10,7 @@ from jose import JWTError, jwt
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session, selectinload
 
-from models import Blog, Tags, User, get_db
+from model.models import Blog, Tags, User, get_db
 
 from .schemas import TokenData, UserUpdate
 
@@ -75,6 +75,7 @@ async def update_user(
                 setattr(user, attr, get_password_hash(getattr(updatedUser, attr)))
             else:
                 setattr(user, attr, getattr(updatedUser, attr))
+    user.updatedAt = datetime.now(UTC)
 
     db.commit()
     db.refresh(user)

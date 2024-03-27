@@ -6,15 +6,15 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
-from passlib.context import CryptContext
+
 from sqlalchemy.orm import Session
 
-from config import ACCESS_TOKEN_EXPIRE_MINUTES, ALGORITHM, SECRET_KEY
-from models import User, get_db
+from config import ACCESS_TOKEN_EXPIRE_MINUTES, ALGORITHM, SECRET_KEY, pwd_context
+from model.models import User, get_db
 
 from .schemas import Token, TokenData, UserCreate
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 router = APIRouter(tags=["auth"])
@@ -113,8 +113,8 @@ async def create_users(userCreate: UserCreate, db: Session = Depends(get_db)):
             name=userCreate.name,
             bio=userCreate.bio,
             role=userCreate.role,
-            createdAt=userCreate.createdAt,
-            updatedAt=userCreate.updatedAt,
+            createdAt=datetime.now(UTC),
+            updatedAt=datetime.now(UTC),
         )
         db.add(db_user)
         db.commit()

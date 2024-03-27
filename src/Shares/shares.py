@@ -1,3 +1,4 @@
+from datetime import UTC, datetime
 import os
 from uuid import UUID, uuid4
 
@@ -7,7 +8,7 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from sqlalchemy.orm import Session
 
-from models import Blog, Shares, User, get_db
+from model.models import Blog, Shares, User, get_db
 
 from .schemas import ShareBlog, TokenData
 
@@ -62,8 +63,8 @@ async def share_blog(
         ShareID=uuid4(),
         UserID=user.id,
         BlogID=payload.BlogID,
-        CreatedAt=payload.CreatedAt,
-        UpdatedAt=payload.UpdatedAt,
+        CreatedAt=datetime.now(UTC),
+        UpdatedAt=datetime.now(UTC),
     )
 
     db.add(share)

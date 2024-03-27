@@ -14,7 +14,6 @@ class UserUpdate(BaseModel):
     password: str = Field(None)
     bio: str = Field(None)
     role: str = Field(None)
-    updatedAt: datetime = Field(None)
 
     class Config:
         orm_mode = True

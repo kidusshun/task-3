@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 # from .schemas import CreateBlogRating, TokenData
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
-from models import Blog, User, BlogTags, get_db
+from model.models import Blog, User, BlogTags, get_db
 from uuid import UUID, uuid4
 
 
@@ -44,4 +44,32 @@ async def get_blog_by_tag(tag: str, db: Session = Depends(get_db)):
     for row in blogTags:
         blog = db.query(Blog).filter(Blog.blogID == row.BlogID).first()
         blogs.append(blog)
+    return blogs
+
+
+@router.get("/get_user/{searchTerm}")
+async def get_user(searchTerm: str, db: Session = Depends(get_db)):
+    users = (
+        db.query(User)
+        .filter(
+            User.username.like(f"%{searchTerm}%"), User.name.like(f"%{searchTerm}%")
+        )
+        .all()
+    )
+    if not users:
+        raise HTTPException(status_code=404, detail="User not found")
+    return users
+
+
+@router.get("/get_blog/{searchTerm}")
+async def get_blog(searchTerm: str, db: Session = Depends(get_db)):
+    blogs = (
+        db.query(Blog)
+        .filter(
+            Blog.title.like(f"%{searchTerm}%", Blog.content.like(f"%{searchTerm}%"))
+        )
+        .all()
+    )
+    if not blogs:
+        raise HTTPException(status_code=404, detail="Blog not found")
     return blogs

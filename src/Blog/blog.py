@@ -1,12 +1,12 @@
-from datetime import datetime
+from datetime import datetime, UTC
 from typing import Annotated
 from uuid import UUID, uuid4
 from fastapi import Depends, HTTPException, status, Query
 from fastapi import APIRouter
 from sqlalchemy.orm import Session, selectinload
-from .schemas import BlogCreate, TokenData
+from src.Blog.schemas import BlogCreate, TokenData
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from models import Blog, User, Tags, get_db
+from model.models import Blog, User, Tags, get_db
 from dotenv import load_dotenv
 from jose import JWTError, jwt
 import os
@@ -56,8 +56,8 @@ async def create_blog(
         title=blogCreate.title,
         content=blogCreate.content,
         userID=user.id,
-        createdAt=blogCreate.createdAt,
-        updatedAt=blogCreate.updatedAt,
+        createdAt=datetime.now(UTC),
+        updatedAt=datetime.now(UTC),
     )
 
     db.add(new_blog)
@@ -107,7 +107,7 @@ async def update_blog(
                 {
                     Blog.title: title,
                     Blog.content: content,
-                    Blog.updatedAt: datetime.now(),
+                    Blog.updatedAt: datetime.now(UTC),
                 }
             )
         )
@@ -115,13 +115,13 @@ async def update_blog(
         blog = (
             db.query(Blog)
             .filter(Blog.blogID == blogID)
-            .update({Blog.title: title, Blog.updatedAt: datetime.now()})
+            .update({Blog.title: title, Blog.updatedAt: datetime.now(UTC)})
         )
     elif content:
         blog = (
             db.query(Blog)
             .filter(Blog.blogID == blogID)
-            .update({Blog.content: content, Blog.updatedAt: datetime.now()})
+            .update({Blog.content: content, Blog.updatedAt: datetime.now(UTC)})
         )
     else:
         raise HTTPException(status_code=400, detail="No data to update")

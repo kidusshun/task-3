@@ -1,4 +1,5 @@
 import os
+from datetime import datetime, UTC
 from uuid import UUID, uuid4
 
 from dotenv import load_dotenv
@@ -8,7 +9,7 @@ from jose import JWTError, jwt
 from sqlalchemy.orm import Session
 
 from config import ACCESS_TOKEN_EXPIRE_MINUTES, ALGORITHM, SECRET_KEY
-from models import Blog, Comments, User, get_db
+from model.models import Blog, Comments, User, get_db
 
 from .schemas import CreateComment, DeleteComment, TokenData, UpdateComment
 
@@ -63,8 +64,8 @@ async def create_comment(
         UserID=user.id,
         BlogID=payload.BlogID,
         content=payload.content,
-        CreatedAt=payload.createdAt,
-        UpdatedAt=payload.updatedAt,
+        CreatedAt=datetime.now(UTC),
+        UpdatedAt=datetime.now(UTC),
     )
 
     db.add(comment)

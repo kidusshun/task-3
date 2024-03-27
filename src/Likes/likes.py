@@ -1,6 +1,7 @@
+from datetime import UTC, datetime
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
-from models import User, Comments, Blog, Likes, get_db
+from model.models import User, Comments, Blog, Likes, get_db
 from .schemas import TokenData, createLike, DeleteLike
 from fastapi.security import OAuth2PasswordBearer
 from dotenv import load_dotenv
@@ -61,8 +62,8 @@ async def like_blog(
         LikeID=uuid4(),
         UserID=user.id,
         BlogID=payload.BlogID,
-        CreatedAt=payload.CreatedAt,
-        UpdatedAt=payload.UpdatedAt,
+        CreatedAt=datetime.now(UTC),
+        UpdatedAt=datetime.now(UTC),
     )
 
     db.add(like)

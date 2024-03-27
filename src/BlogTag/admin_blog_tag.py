@@ -1,16 +1,17 @@
-from fastapi import APIRouter, Depends, HTTPException, Query, status
-from sqlalchemy.orm import Session
-from models import User, Tags, get_db
-from .schemas import TokenData, Tag, UpdateTag
-from fastapi.security import OAuth2PasswordBearer
-from dotenv import load_dotenv
-from jose import jwt, JWTError
 import os
-
+from datetime import UTC, datetime
 from uuid import UUID, uuid4
 
+from dotenv import load_dotenv
+from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi.security import OAuth2PasswordBearer
+from jose import JWTError, jwt
+from sqlalchemy.orm import Session
 
 from config import ACCESS_TOKEN_EXPIRE_MINUTES, ALGORITHM, SECRET_KEY
+from model.models import Tags, User, get_db
+
+from .schemas import Tag, TokenData, UpdateTag
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
@@ -44,19 +45,23 @@ async def get_current_active_user(
     return user
 
 
+async def get_admin_role(user: User = Depends(get_current_active_user)):
+    if user.role != "admin":
+        raise HTTPException(
+            status_code=403, detail="You are not authorized to perform this action"
+        )
+    return user
+
+
 router = APIRouter(tags=["Tags"])
 
 
 @router.post("/create_tag")
 async def create_tag(
     create_tag: Tag,
-    user: User = Depends(get_current_active_user),
+    user: User = Depends(get_admin_role),
     db: Session = Depends(get_db),
 ):
-    if user.role != "admin":
-        raise HTTPException(
-            status_code=403, detail="You are not authorized to create a tag"
-        )
 
     tag = db.query(Tags).filter(Tags.TagName == create_tag.TagName).first()
 
@@ -65,8 +70,8 @@ async def create_tag(
 
     tag = Tags(
         TagName=create_tag.TagName,
-        createdAt=create_tag.createdAt,
-        updatedAt=create_tag.updatedAt,
+        createdAt=datetime.now(UTC),
+        updatedAt=datetime.now(UTC),
     )
 
     db.add(tag)
@@ -91,13 +96,9 @@ async def get_tag_by_ID(tagName: str, db: Session = Depends(get_db)):
 @router.put("/update_tag")
 async def update_tag(
     tag: UpdateTag,
-    user: User = Depends(get_current_active_user),
+    user: User = Depends(get_admin_role),
     db: Session = Depends(get_db),
 ):
-    if user.role != "admin":
-        raise HTTPException(
-            status_code=403, detail="You are not authorized to update a tag"
-        )
 
     tag_db = db.query(Tags).filter(Tags.TagName == tag.OriginalTagName).first()
 
@@ -115,10 +116,6 @@ def delete_tag(
     user: User = Depends(get_current_active_user),
     db: Session = Depends(get_db),
 ):
-    if user.role != "admin":
-        raise HTTPException(
-            status_code=403, detail="You are not authorized to delete a tag"
-        )
 
     tag = db.query(Tags).filter(Tags.TagName == tagName).first()
     if not tag:
