@@ -4,9 +4,9 @@ from uuid import UUID, uuid4
 from fastapi import Depends, HTTPException, status, Query
 from fastapi import APIRouter
 from sqlalchemy.orm import Session, selectinload
-from src.Blog.schemas import BlogCreate, TokenData
+from src.Blog.schemas import BlogCreate, TokenData, UpdateBlog
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from model.models import Blog, User, Tags, get_db
+from models import Blog, User, Tags, get_db
 from dotenv import load_dotenv
 from jose import JWTError, jwt
 import os
@@ -63,7 +63,7 @@ async def create_blog(
     db.add(new_blog)
     db.commit()
     db.refresh(new_blog)
-    return new_blog
+    return new_blog.__dict__
 
 
 @router.get("/get_all_blog")
@@ -91,37 +91,39 @@ async def get_blog(blogID: UUID, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Blog not found")
 
 
-@router.put("/update_blog")
+@router.put("/update_blog/{blogID}")
 async def update_blog(
     blogID: UUID,
+    updateBlog: UpdateBlog,
     db: Session = Depends(get_db),
     user: User = Depends(get_current_active_user),
-    title: Annotated[str | None, Query()] = None,
-    content: Annotated[str | None, Query()] = None,
 ):
-    if title and content:
+
+    if updateBlog.title and updateBlog.content:
         blog = (
             db.query(Blog)
             .filter(Blog.blogID == blogID)
             .update(
                 {
-                    Blog.title: title,
-                    Blog.content: content,
+                    Blog.title: updateBlog.title,
+                    Blog.content: updateBlog.content,
                     Blog.updatedAt: datetime.now(UTC),
                 }
             )
         )
-    elif title:
+    elif updateBlog.title:
         blog = (
             db.query(Blog)
             .filter(Blog.blogID == blogID)
-            .update({Blog.title: title, Blog.updatedAt: datetime.now(UTC)})
+            .update({Blog.title: updateBlog.title, Blog.updatedAt: datetime.now(UTC)})
         )
-    elif content:
+    elif updateBlog.content:
         blog = (
             db.query(Blog)
             .filter(Blog.blogID == blogID)
-            .update({Blog.content: content, Blog.updatedAt: datetime.now(UTC)})
+            .update(
+                {Blog.content: updateBlog.content, Blog.updatedAt: datetime.now(UTC)}
+            )
         )
     else:
         raise HTTPException(status_code=400, detail="No data to update")
@@ -133,7 +135,7 @@ async def update_blog(
         raise HTTPException(status_code=404, detail="Blog not found")
 
 
-@router.delete("/delete_blog")
+@router.delete("/delete_blog/{blogID}")
 async def delete_blog(
     blogID: UUID,
     db: Session = Depends(get_db),

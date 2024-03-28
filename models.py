@@ -3,10 +3,10 @@ from sqlalchemy.orm import relationship, selectinload
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from config import SQLALCHEMY_DATABASE_URL
+from config import SEQLALCHEMY_DATABASE_URL, TEST_SQLALCHEMY_DATABASE_URL
 
-
-engine = create_engine(SQLALCHEMY_DATABASE_URL)
+print(SEQLALCHEMY_DATABASE_URL)
+engine = create_engine(SEQLALCHEMY_DATABASE_URL)
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
@@ -160,7 +160,6 @@ class Follows(Base):
 
 
 def create_db():
-    # Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
 
 

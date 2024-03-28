@@ -14,7 +14,6 @@ class CreateComment(BaseModel):
 
 class UpdateComment(BaseModel):
     CommentID: UUID
-    BlogID: UUID
     comment: str
 
 

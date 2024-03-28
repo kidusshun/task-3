@@ -10,7 +10,7 @@ from jose import JWTError, jwt
 from sqlalchemy.orm import Session
 
 from config import ACCESS_TOKEN_EXPIRE_MINUTES, ALGORITHM, SECRET_KEY, pwd_context
-from model.models import User, get_db
+from models import User, get_db
 
 from .schemas import Token, TokenData, UserCreate
 

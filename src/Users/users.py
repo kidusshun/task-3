@@ -10,7 +10,7 @@ from jose import JWTError, jwt
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session, selectinload
 
-from model.models import Blog, Tags, User, get_db
+from models import Blog, Tags, User, get_db
 
 from .schemas import TokenData, UserUpdate
 

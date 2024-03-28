@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
-from model.models import User, Comments, Blog, Follows, get_db
+from models import User, Comments, Blog, Follows, get_db
 from .schemas import TokenData, FollowUser, UnFollowUser
 from fastapi.security import OAuth2PasswordBearer
 from dotenv import load_dotenv

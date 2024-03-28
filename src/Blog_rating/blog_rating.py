@@ -1,17 +1,13 @@
-import os
 from datetime import UTC, datetime
-from typing import Annotated
-from uuid import UUID, uuid4
+from uuid import uuid4
 
-from dotenv import load_dotenv
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
-from jose import JWTError, jwt
 from sqlalchemy.orm import Session
 
 from src.authentication.auth import get_current_active_user
 from config import ACCESS_TOKEN_EXPIRE_MINUTES, ALGORITHM, SECRET_KEY
-from model.models import Blog, BlogRatings, User, get_db
+from models import Blog, BlogRatings, User, get_db
 
 from .schemas import CreateBlogRating, TokenData
 

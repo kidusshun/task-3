@@ -8,7 +8,7 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from sqlalchemy.orm import Session
 
-from model.models import Blog, BlogTags, Tags, User, get_db
+from models import Blog, BlogTags, Tags, User, get_db
 
 from .schemas import AddTag, RemoveTag, Tag, TokenData
 
@@ -84,12 +84,13 @@ async def add_tag(
             BlogTagID=uuid4(),
             BlogID=payload.BlogID,
             UserID=user.id,
-            TagName=datetime.now(UTC),
+            TagName=tag.TagName,
+            createdAt=datetime.now(UTC),
             updatedAt=datetime.now(UTC),
         )
     )
     db.commit()
-    return payload.dict()
+    return BlogTags.__dict__
 
 
 @router.delete("/delete_blog_tag")

@@ -9,7 +9,7 @@ from jose import JWTError, jwt
 from sqlalchemy.orm import Session
 
 from config import ACCESS_TOKEN_EXPIRE_MINUTES, ALGORITHM, SECRET_KEY
-from model.models import Blog, Comments, User, get_db
+from models import Blog, Comments, User, get_db
 
 from .schemas import CreateComment, DeleteComment, TokenData, UpdateComment
 

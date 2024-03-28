@@ -8,7 +8,7 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from sqlalchemy.orm import Session
 
-from model.models import Blog, Shares, User, get_db
+from models import Blog, Shares, User, get_db
 
 from .schemas import ShareBlog, TokenData
 

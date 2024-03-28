@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 # from .schemas import CreateBlogRating, TokenData
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
-from model.models import Blog, User, BlogTags, get_db
+from models import Blog, User, BlogTags, get_db
 from uuid import UUID, uuid4
 
 
@@ -66,7 +66,7 @@ async def get_blog(searchTerm: str, db: Session = Depends(get_db)):
     blogs = (
         db.query(Blog)
         .filter(
-            Blog.title.like(f"%{searchTerm}%", Blog.content.like(f"%{searchTerm}%"))
+            Blog.title.like(f"%{searchTerm}%"), Blog.content.like(f"%{searchTerm}%")
         )
         .all()
     )
