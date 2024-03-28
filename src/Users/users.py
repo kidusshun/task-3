@@ -97,7 +97,6 @@ async def delete_user(
     user: User = Depends(get_current_active_user), db: Session = Depends(get_db)
 ):
     user = db.query(User).filter(User.id == user.id).first()
-    print(user)
     db.delete(user)
     db.commit()
     return {"message": "User deleted successfully"}

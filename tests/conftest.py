@@ -16,6 +16,7 @@ from config import SECRET_KEY, ALGORITHM, TEST_SQLALCHEMY_DATABASE_URL
 from jose import jwt
 
 from fastapi.testclient import TestClient
+from src.BlogTag.admin_blog_tag import get_current_active_user
 
 
 from main import app
@@ -43,8 +44,27 @@ def loggedin_user():
     return token
 
 
-def loggedin_admin():
-    token = create_access_token(data={"sub": "test_admin"})
+@pytest.fixture(scope="session")
+def create_admin(client):
+    response = client.post(
+        "/create/",
+        json={
+            "email": "admin@gmail.com",
+            "password": "pass",
+            "username": "admin",
+            "name": "admin",
+            "bio": "hello",
+            "role": "admin",
+        },
+    )
+    response_json = response.json()
+    # print(response_json)
+    return response_json["username"]
+
+
+@pytest.fixture(scope="session")
+def loggedin_admin(create_admin):
+    token = create_access_token(data={"sub": create_admin})
 
 
 @pytest.fixture(scope="session")
@@ -63,3 +83,9 @@ def created_blog(client, loggedin_user):
         },
     )
     return response.json()["blogID"]
+
+
+@pytest.fixture(scope="session")
+def current_admin(create_admin):
+    token = create_access_token(data={"sub": create_admin})
+    return get_current_active_user(token)

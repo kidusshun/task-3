@@ -77,7 +77,6 @@ async def follow(
         CreatedAt=datetime.now(UTC),
         UpdatedAt=datetime.now(UTC),
     )
-    print(db_follow)
     db.add(db_follow)
     db.commit()
     db.refresh(db_follow)
