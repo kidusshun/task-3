@@ -46,8 +46,28 @@ async def rate_blog(
         db.refresh(new_blog_rating)
         return new_blog_rating.__dict__
     else:
-        blog_rating.rating = createRating.rating
-        blog_rating.updatedAt = datetime.now(UTC)
-        db.commit()
-        db.refresh(blog_rating)
-        return blog_rating.__dict__
+        raise HTTPException(status_code=400, detail="Rating already exists")
+
+
+@router.put("/update_rating")
+async def update_blog_raing(
+    updateRating: CreateBlogRating,
+    user: User = Depends(get_current_active_user),
+    db: Session = Depends(get_db),
+):
+
+    blog_rating = (
+        db.query(BlogRatings)
+        .filter(
+            BlogRatings.blogID == updateRating.blogID, BlogRatings.userID == user.id
+        )
+        .first()
+    )
+
+    if not blog_rating:
+        raise HTTPException(status_code=404, detail="blog rating not found")
+    blog_rating.rating = updateRating.rating
+    blog_rating.updatedAt = datetime.now(UTC)
+    db.commit()
+    db.refresh(blog_rating)
+    return {"message": "Rating updated successfully"}

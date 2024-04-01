@@ -89,3 +89,16 @@ def created_blog(client, loggedin_user):
 def current_admin(create_admin):
     token = create_access_token(data={"sub": create_admin})
     return get_current_active_user(token)
+
+
+@pytest.fixture(scope="session")
+def create_blog_rating(client, loggedin_user, created_blog):
+    headers = {"Authorization": f"Bearer {loggedin_user}"}
+    response = client.post(
+        "/rate_blog",
+        headers=headers,
+        json={"blogID": created_blog, "rating": 3},
+    )
+
+    response = response.json()
+    return response
